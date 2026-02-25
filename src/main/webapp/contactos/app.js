@@ -1,4 +1,6 @@
-const API_URL = '/api/vuelos';
+const API_URL = window.location.pathname.includes('/contactos-crud-jakartaee/api/vuelos')
+    ? window.location.pathname.split('/contactos-crud-jakartaee/api/vuelos')[0] + '/contactos-crud-jakartaee/api/vuelos'
+    : '/contactos-crud-jakartaee/api/vuelos';
 
 document.addEventListener('DOMContentLoaded', () => {
     const tablaBody = document.getElementById('tabla-vuelos');
