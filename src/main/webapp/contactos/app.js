@@ -1,6 +1,12 @@
-const API_URL = window.location.pathname.includes('/contactos-crud-jakartaee/api/vuelos')
-    ? window.location.pathname.split('/contactos-crud-jakartaee/api/vuelos')[0] + '/contactos-crud-jakartaee/api/vuelos'
-    : '/contactos-crud-jakartaee/api/vuelos';
+// Detecta la ruta base automáticamente.
+// Si estás en Render, será "/"
+// Si estás en Local, será "/contactos-crud-jakartaee/"
+const pathBase = window.location.pathname.endsWith('/')
+    ? window.location.pathname
+    : window.location.pathname + '/';
+
+// Combinamos la ruta actual con el endpoint de tu API
+const API_URL = pathBase + 'api/vuelos';
 
 document.addEventListener('DOMContentLoaded', () => {
     const tablaBody = document.getElementById('tabla-vuelos');
@@ -9,16 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function cargarVuelos() {
         try {
+            console.log("Intentando conectar a:", API_URL); // Para que verifiques en la consola
             const respuesta = await fetch(API_URL);
-            if (!respuesta.ok) throw new Error('Error al conectar con la API');
-            const vuelos = await respuesta.json();
 
-            // Revisa la consola (F12) para ver los nombres reales de los campos
+            if (!respuesta.ok) {
+                throw new Error(`Error HTTP: ${respuesta.status} - No se encontró la API`);
+            }
+
+            const vuelos = await respuesta.json();
             console.log("Datos recibidos:", vuelos);
 
             pintarTabla(vuelos);
         } catch (error) {
-            console.error(error);
+            console.error("Error al cargar vuelos:", error);
+            tablaBody.innerHTML = `<tr><td colspan="8" style="color:red; text-align:center;">
+                Error al conectar con la API. Revisa la consola.
+            </td></tr>`;
         }
     }
 
@@ -32,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
         vuelos.forEach(vuelo => {
             const tr = document.createElement('tr');
 
-
+            // Manejo de nombres de campos (soporta varios formatos de JSON)
             const codigo = vuelo.codigoVuelo || vuelo.codigo || "---";
             const compania = vuelo.compania || "---";
             const avion = vuelo.avion || "---";
